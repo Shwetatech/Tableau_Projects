@@ -296,7 +296,7 @@ Unified global view across 6 international locations. Features a dashboard healt
 
 ## 🚀 How to Use
 
-### Connect CSVs to Tableau
+### Connect CSVs or Excel to Tableau
 1. Open Tableau Desktop
 2. Click **Connect → Text File**
 3. Select a `.csv` from the `/datasets/` folder
