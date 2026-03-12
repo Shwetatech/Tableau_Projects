@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heart Disease Analysis Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #141720;
+    --surface2: #1c2030;
+    --surface3: #232840;
+    --border: #2a3050;
+    --accent: #e84855;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --text: #e8eaf0;
+    --text2: #8892b0;
+    --text3: #4a5568;
+    --card-glow: 0 0 40px rgba(232,72,85,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Instrument Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(42,48,80,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(42,48,80,0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .dashboard {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .header-left h1 span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .header-left p {
+    color: var(--text2);
+    font-size: 0.85rem;
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 12px;
+  }
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
+  .badge-red { background: rgba(232,72,85,0.15); color: var(--accent); border: 1px solid rgba(232,72,85,0.3); }
+  .badge-blue { background: rgba(59,130,246,0.15); color: var(--accent2); border: 1px solid rgba(59,130,246,0.3); }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--accent3); border: 1px solid rgba(16,185,129,0.3); }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .accuracy-display {
+    font-family: 'DM Serif Display', serif;
+    font-size: 3.5rem;
+    color: var(--accent3);
+    line-height: 1;
+  }
+
+  .accuracy-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* KPI Row */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .kpi-card:hover { border-color: var(--accent); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .kpi-card.red::before { background: var(--accent); }
+  .kpi-card.blue::before { background: var(--accent2); }
+  .kpi-card.green::before { background: var(--accent3); }
+  .kpi-card.amber::before { background: var(--accent4); }
+  .kpi-card.purple::before { background: #a78bfa; }
+
+  .kpi-label {
+    font-size: 0.68rem;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-card.red .kpi-value { color: var(--accent); }
+  .kpi-card.blue .kpi-value { color: var(--accent2); }
+  .kpi-card.green .kpi-value { color: var(--accent3); }
+  .kpi-card.amber .kpi-value { color: var(--accent4); }
+  .kpi-card.purple .kpi-value { color: #a78bfa; }
+
+  .kpi-sub {
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+
+  /* Grid Layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px; }
+
+  /* Chart Cards */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: var(--card-glow);
+  }
+
+  .chart-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .chart-subtitle {
+    font-size: 0.7rem;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  /* Donut Chart */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .donut-svg { flex-shrink: 0; }
+
+  .donut-legend { flex: 1; }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .legend-label {
+    font-size: 0.78rem;
+    color: var(--text2);
+  }
+
+  .legend-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .legend-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text3);
+  }
+
+  /* Bar Charts */
+  .bar-group { margin-bottom: 12px; }
+
+  .bar-label-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+
+  .bar-label {
+    font-size: 0.75rem;
+    color: var(--text2);
+  }
+
+  .bar-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+  }
+
+  .bar-track {
+    height: 8px;
+    background: var(--surface3);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Stacked Gender bars */
+  .gender-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .gender-label-col {
+    width: 60px;
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-align: right;
+  }
+
+  .stacked-track {
+    flex: 1;
+    height: 28px;
+    background: var(--surface3);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .stack-seg {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.8);
+    transition: width 1s;
+    white-space: nowrap;
+  }
+
+  /* Age distribution */
+  .age-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 130px;
+    margin-bottom: 8px;
+  }
+
+  .age-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .age-bar-present {
+    width: 100%;
+    background: var(--accent);
+    border-radius: 3px 3px 0 0;
+    transition: height 1s;
+  }
+
+  .age-bar-absent {
+    width: 100%;
+    background: var(--accent2);
+    border-radius: 3px 3px 0 0;
+    transition: height 1s;
+  }
+
+  .age-x-label {
+    font-size: 0.65rem;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    margin-top: 5px;
+  }
+
+  /* Scatter / Correlation */
+  .scatter-area {
+    position: relative;
+    height: 200px;
+    background: var(--surface2);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .scatter-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .scatter-dot:hover { transform: translate(-50%,-50%) scale(2); z-index: 10; }
+
+  /* Decision Tree */
+  .tree-container {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+  }
+
+  .tree-svg-wrap { min-width: 500px; }
+
+  /* Rules list */
+  .rule-item {
+    display: flex;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    background: var(--surface2);
+    border-left: 3px solid transparent;
+    font-size: 0.76rem;
+    align-items: flex-start;
+    transition: background 0.2s;
+  }
+
+  .rule-item:hover { background: var(--surface3); }
+
+  .rule-item.present { border-color: var(--accent); }
+  .rule-item.absent { border-color: var(--accent2); }
+
+  .rule-num {
+    font-family: 'DM Mono', monospace;
+    color: var(--text3);
+    font-size: 0.65rem;
+    min-width: 18px;
+    padding-top: 1px;
+  }
+
+  .rule-text { color: var(--text2); line-height: 1.4; }
+
+  .rule-outcome {
+    margin-left: auto;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .outcome-present { background: rgba(232,72,85,0.15); color: var(--accent); }
+  .outcome-absent { background: rgba(59,130,246,0.15); color: var(--accent2); }
+
+  /* Confusion Matrix */
+  .cm-grid {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    grid-template-rows: auto 1fr 1fr;
+    gap: 6px;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .cm-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+    text-align: center;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px;
+  }
+
+  .cm-side-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    writing-mode: horizontal-tb;
+  }
+
+  .cm-cell {
+    border-radius: 8px;
+    padding: 16px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .cm-tp { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); }
+  .cm-fn { background: rgba(232,72,85,0.12); border: 1px solid rgba(232,72,85,0.25); }
+  .cm-fp { background: rgba(232,72,85,0.12); border: 1px solid rgba(232,72,85,0.25); }
+  .cm-tn { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); }
+
+  .cm-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+
+  .cm-tp .cm-number, .cm-tn .cm-number { color: var(--accent3); }
+  .cm-fn .cm-number, .cm-fp .cm-number { color: var(--accent); }
+
+  .cm-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  /* Chest pain chart */
+  .cp-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .cp-label {
+    width: 140px;
+    font-size: 0.73rem;
+    color: var(--text2);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .cp-dual {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .cp-sub-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cp-sex-label {
+    width: 14px;
+    font-size: 0.6rem;
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .cp-mini-track {
+    flex: 1;
+    height: 12px;
+    background: var(--surface3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .cp-mini-fill { height: 100%; border-radius: 3px; }
+
+  .cp-count {
+    width: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+  }
+
+  /* Metrics row */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .metric-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .metric-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--accent3);
+    margin-bottom: 4px;
+  }
+
+  .metric-label {
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Donut SVG center text */
+  .donut-center {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    fill: var(--text);
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+
+  .donut-center-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    fill: var(--text3);
+    text-anchor: middle;
+    dominant-baseline: middle;
+    letter-spacing: 1px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+
+  .pulse-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent3);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* Animate bars on load */
+  @keyframes growBar {
+    from { width: 0; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .kpi-card { animation: fadeUp 0.5s ease both; }
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+  .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+
+  .chart-card { animation: fadeUp 0.6s ease both; animation-delay: 0.3s; }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.72rem;
+    color: var(--text);
+    pointer-events: none;
+    z-index: 1000;
+    font-family: 'DM Mono', monospace;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  /* ECG line decoration */
+  .ecg-decoration {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 30px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <h1>Heart Disease <span>Risk</span> Analysis</h1>
+      <p>STATLOG HEART DATASET · 270 PATIENTS · 14 ATTRIBUTES · WEKA J48 · TABLEAU EDA</p>
+      <div class="header-badges">
+        <span class="badge badge-red">120 DISEASE</span>
+        <span class="badge badge-blue">150 NO DISEASE</span>
+        <span class="badge badge-green">J48 DECISION TREE</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="accuracy-display">92.3%</div>
+      <div class="accuracy-label">MODEL ACCURACY</div>
+    </div>
+  </header>
+
+  <!-- KPI Row -->
+  <div class="kpi-row">
+    <div class="kpi-card red">
+      <div class="kpi-label">Total Patients</div>
+      <div class="kpi-value">270</div>
+      <div class="kpi-sub">4 institutions combined</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Disease Present</div>
+      <div class="kpi-value">44.4%</div>
+      <div class="kpi-sub">120 patients affected</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Male Risk Rate</div>
+      <div class="kpi-value">37%</div>
+      <div class="kpi-sub">vs 7.4% female</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">ROC Area</div>
+      <div class="kpi-value">0.964</div>
+      <div class="kpi-sub">Excellent discrimination</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Peak Risk Age</div>
+      <div class="kpi-value">U60</div>
+      <div class="kpi-sub">50–59 years old group</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Donut + Gender + Chest Pain -->
+  <div class="grid-3">
+
+    <!-- Disease Distribution Donut -->
+    <div class="chart-card">
+      <div class="chart-title">Disease Distribution</div>
+      <div class="chart-subtitle">PRESENCE VS ABSENCE · ALL PATIENTS</div>
+      <div class="donut-wrap">
+        <svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130">
+          <!-- Background circle -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#1c2030" stroke-width="18"/>
+          <!-- Absent (55.56%) -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#3b82f6" stroke-width="18"
+            stroke-dasharray="168.2 301.6" stroke-dashoffset="0"
+            stroke-linecap="butt" transform="rotate(-90 65 65)"/>
+          <!-- Present (44.44%) -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#e84855" stroke-width="18"
+            stroke-dasharray="133.4 336.4" stroke-dashoffset="-168.2"
+            stroke-linecap="butt" transform="rotate(-90 65 65)"/>
+          <text x="65" y="60" class="donut-center">270</text>
+          <text x="65" y="75" class="donut-center-sub">TOTAL</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#e84855"></div>
+            <div>
+              <div class="legend-label">Disease Present</div>
+              <div style="display:flex;gap:8px;align-items:baseline;">
+                <span class="legend-val">120</span>
+                <span class="legend-pct">44.44%</span>
+              </div>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#3b82f6"></div>
+            <div>
+              <div class="legend-label">Disease Absent</div>
+              <div style="display:flex;gap:8px;align-items:baseline;">
+                <span class="legend-val">150</span>
+                <span class="legend-pct">55.56%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gender Risk -->
+    <div class="chart-card">
+      <div class="chart-title">Gender vs Heart Disease Risk</div>
+      <div class="chart-subtitle">DISEASE PRESENT/ABSENT SPLIT BY SEX</div>
+
+      <div class="gender-row" style="margin-top:8px;">
+        <div class="gender-label-col">Male<br><span style="font-size:0.62rem;color:var(--text3)">n=183</span></div>
+        <div style="flex:1;">
+          <div class="stacked-track">
+            <div class="stack-seg" style="width:45.9%;background:var(--accent);">37% ●</div>
+            <div class="stack-seg" style="width:54.1%;background:var(--accent2);">63%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gender-row">
+        <div class="gender-label-col">Female<br><span style="font-size:0.62rem;color:var(--text3)">n=87</span></div>
+        <div style="flex:1;">
+          <div class="stacked-track">
+            <div class="stack-seg" style="width:23%;background:var(--accent);">7.4%</div>
+            <div class="stack-seg" style="width:77%;background:var(--accent2);">92.6% No Disease</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:10px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--accent);">
+        <p style="font-size:0.72rem;color:var(--text2);line-height:1.5;">Males are <span style="color:var(--accent);font-family:'DM Mono',monospace;font-weight:500;">5× more likely</span> to present with heart disease than females in this dataset (37% vs 7.4%)</p>
+      </div>
+    </div>
+
+    <!-- Chest Pain Types -->
+    <div class="chart-card">
+      <div class="chart-title">Chest Pain Types — Disease Present</div>
+      <div class="chart-subtitle">TOP ANGINA CATEGORIES BY SEX</div>
+
+      <div class="cp-bar-row" style="margin-top:8px;">
+        <div class="cp-label">Typical Angina</div>
+        <div class="cp-dual">
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">M</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:80%;background:var(--accent);"></div></div>
+            <span class="cp-count">29</span>
+          </div>
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">F</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:18%;background:rgba(232,72,85,0.4);"></div></div>
+            <span class="cp-count">2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cp-bar-row">
+        <div class="cp-label">Atypical Angina</div>
+        <div class="cp-dual">
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">M</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:52%;background:var(--accent4);"></div></div>
+            <span class="cp-count">19</span>
+          </div>
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">F</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:5%;background:rgba(245,158,11,0.4);"></div></div>
+            <span class="cp-count">2</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cp-bar-row">
+        <div class="cp-label">Non-Anginal</div>
+        <div class="cp-dual">
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">M</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:25%;background:var(--accent2);"></div></div>
+            <span class="cp-count">9</span>
+          </div>
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">F</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:3%;background:rgba(59,130,246,0.4);"></div></div>
+            <span class="cp-count">1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cp-bar-row" style="margin-bottom:0;">
+        <div class="cp-label">Asymptomatic</div>
+        <div class="cp-dual">
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">M</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:100%;background:rgba(167,139,250,0.7);"></div></div>
+            <span class="cp-count">65+</span>
+          </div>
+          <div class="cp-sub-row">
+            <span class="cp-sex-label">F</span>
+            <div class="cp-mini-track"><div class="cp-mini-fill" style="width:8%;background:rgba(167,139,250,0.3);"></div></div>
+            <span class="cp-count">3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Age Distribution + Cholesterol + BP -->
+  <div class="grid-2-1">
+
+    <!-- Age Distribution -->
+    <div class="chart-card">
+      <div class="chart-title">Age Group Distribution</div>
+      <div class="chart-subtitle">DISEASE PRESENT (RED) VS ABSENT (BLUE) BY AGE BRACKET</div>
+      <div style="display:flex;gap:16px;margin-top:8px;">
+        <div style="flex:1;">
+          <div class="age-bars" id="ageBars">
+            <!-- Rendered by JS -->
+          </div>
+          <div style="display:flex;gap:8px;justify-content:space-around;">
+            <span class="age-x-label">U30</span>
+            <span class="age-x-label">U40</span>
+            <span class="age-x-label">U50</span>
+            <span class="age-x-label">U60</span>
+            <span class="age-x-label">U70</span>
+            <span class="age-x-label">U80</span>
+          </div>
+        </div>
+        <div style="width:120px;">
+          <div style="margin-bottom:12px;">
+            <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Legend</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <div style="width:10px;height:10px;background:var(--accent);border-radius:2px;"></div>
+              <span style="font-size:0.72rem;color:var(--text2);">Disease Present</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div style="width:10px;height:10px;background:var(--accent2);border-radius:2px;"></div>
+              <span style="font-size:0.72rem;color:var(--text2);">No Disease</span>
+            </div>
+          </div>
+          <div style="background:var(--surface2);border-radius:6px;padding:10px;border-left:3px solid var(--accent4);">
+            <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--text3);letter-spacing:0.05em;margin-bottom:4px;">PEAK RISK AGE</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:1.6rem;color:var(--accent4);">U60</div>
+            <div style="font-size:0.68rem;color:var(--text2);margin-top:2px;">50–59 yrs · 107 total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cholesterol Levels -->
+    <div class="chart-card">
+      <div class="chart-title">Cholesterol Levels</div>
+      <div class="chart-subtitle">BY DISEASE STATUS</div>
+
+      <div style="margin-top:8px;">
+        <div style="font-size:0.7rem;color:var(--text3);margin-bottom:8px;font-family:'DM Mono',monospace;">HIGH RISK CHOL (>240)</div>
+        <div class="bar-group">
+          <div class="bar-label-row">
+            <span class="bar-label">Disease Present</span>
+            <span class="bar-val">59%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:59%;background:var(--accent);"></div>
+          </div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-label-row">
+            <span class="bar-label">No Disease</span>
+            <span class="bar-val">38%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:38%;background:var(--accent2);"></div>
+          </div>
+        </div>
+
+        <div style="font-size:0.7rem;color:var(--text3);margin-bottom:8px;margin-top:14px;font-family:'DM Mono',monospace;">HIGH BP + HIGH-RISK CHOL</div>
+        <div class="bar-group" style="margin-bottom:0;">
+          <div class="bar-label-row">
+            <span class="bar-label">Both High</span>
+            <span class="bar-val">76 pts</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:76%;background:linear-gradient(90deg,var(--accent),var(--accent4));"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Decision Tree Rules + Confusion Matrix + Model Metrics -->
+  <div class="grid-2">
+
+    <!-- Decision Tree Rules -->
+    <div class="chart-card">
+      <div class="chart-title">J48 Decision Tree Rules</div>
+      <div class="chart-subtitle">DERIVED CLASSIFICATION RULES · WEKA OUTPUT · TREE SIZE 17 · 11 LEAVES</div>
+
+      <div style="margin-top:8px;">
+        <div class="rule-item present">
+          <span class="rule-num">01</span>
+          <span class="rule-text">Vessels = Coloured + Chol = High Risk</span>
+          <span class="rule-outcome outcome-present">PRESENT</span>
+        </div>
+        <div class="rule-item absent">
+          <span class="rule-num">02</span>
+          <span class="rule-text">Vessels = Coloured + Chol = Normal</span>
+          <span class="rule-outcome outcome-absent">ABSENT</span>
+        </div>
+        <div class="rule-item absent">
+          <span class="rule-num">03</span>
+          <span class="rule-text">Vessels = Coloured + Chol = High + Thalassemia = No</span>
+          <span class="rule-outcome outcome-absent">ABSENT</span>
+        </div>
+        <div class="rule-item present">
+          <span class="rule-num">04</span>
+          <span class="rule-text">Vessels = Coloured + Chol = High + Thalassemia = Fixed</span>
+          <span class="rule-outcome outcome-present">PRESENT</span>
+        </div>
+        <div class="rule-item present">
+          <span class="rule-num">05</span>
+          <span class="rule-text">Vessels = Coloured + Chol = High + Thalassemia = Reversible</span>
+          <span class="rule-outcome outcome-present">PRESENT</span>
+        </div>
+        <div class="rule-item absent">
+          <span class="rule-num">06</span>
+          <span class="rule-text">Vessels = Not Coloured + CP = Atypical / Non-Anginal Angina</span>
+          <span class="rule-outcome outcome-absent">ABSENT</span>
+        </div>
+        <div class="rule-item present">
+          <span class="rule-num">07</span>
+          <span class="rule-text">Vessels = Not Coloured + CP = Asymptomatic + BP = High</span>
+          <span class="rule-outcome outcome-present">PRESENT</span>
+        </div>
+        <div class="rule-item absent">
+          <span class="rule-num">08</span>
+          <span class="rule-text">Vessels = Not Coloured + CP = Asymptomatic + BP = Normal</span>
+          <span class="rule-outcome outcome-absent">ABSENT</span>
+        </div>
+        <div class="rule-item present">
+          <span class="rule-num">09</span>
+          <span class="rule-text">Vessels = Not Coloured + CP = Typical Angina + B_sugar = High</span>
+          <span class="rule-outcome outcome-present">PRESENT</span>
+        </div>
+        <div class="rule-item absent">
+          <span class="rule-num">10</span>
+          <span class="rule-text">Vessels = Not Coloured + CP = Typical Angina + B_sugar = Low</span>
+          <span class="rule-outcome outcome-absent">ABSENT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel: Confusion Matrix + Metrics -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- Confusion Matrix -->
+      <div class="chart-card">
+        <div class="chart-title">Confusion Matrix</div>
+        <div class="chart-subtitle">66% TRAIN / 34% TEST SPLIT · 87 TEST INSTANCES</div>
+
+        <div style="display:flex;gap:24px;align-items:flex-start;margin-top:12px;">
+          <div class="cm-grid">
+            <div></div>
+            <div class="cm-header">Predicted<br>Present</div>
+            <div class="cm-header">Predicted<br>Absent</div>
+
+            <div class="cm-side-header">Actual<br>Present</div>
+            <div class="cm-cell cm-tp">
+              <div class="cm-number">45</div>
+              <div class="cm-tag">TP</div>
+            </div>
+            <div class="cm-cell cm-fn">
+              <div class="cm-number">4</div>
+              <div class="cm-tag">FN</div>
+            </div>
+
+            <div class="cm-side-header">Actual<br>Absent</div>
+            <div class="cm-cell cm-fp">
+              <div class="cm-number">3</div>
+              <div class="cm-tag">FP</div>
+            </div>
+            <div class="cm-cell cm-tn">
+              <div class="cm-number">40</div>
+              <div class="cm-tag">TN</div>
+            </div>
+          </div>
+
+          <div style="flex:1;">
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <div class="metric-val">0.924</div>
+                <div class="metric-label">Accuracy</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-val">0.938</div>
+                <div class="metric-label">Precision</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-val">0.918</div>
+                <div class="metric-label">Recall</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-val">0.928</div>
+                <div class="metric-label">F-Measure</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-val">0.848</div>
+                <div class="metric-label">MCC</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-val">0.964</div>
+                <div class="metric-label">ROC Area</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Risk Factors -->
+      <div class="chart-card">
+        <div class="chart-title">Key Risk Factor Indicators</div>
+        <div class="chart-subtitle">CORRELATION STRENGTH WITH DISEASE PRESENCE</div>
+        <div style="margin-top:10px;">
+          <div class="bar-group">
+            <div class="bar-label-row"><span class="bar-label">Vessel Colouring (Fluoroscopy)</span><span class="bar-val">High</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:92%;background:var(--accent);"></div></div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-label-row"><span class="bar-label">Thalassemia (Fixed/Reversible)</span><span class="bar-val">High</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:85%;background:var(--accent);"></div></div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-label-row"><span class="bar-label">Chest Pain Type</span><span class="bar-val">Med-High</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--accent4);"></div></div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-label-row"><span class="bar-label">Cholesterol Level</span><span class="bar-val">Medium</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent4);"></div></div>
+          </div>
+          <div class="bar-group" style="margin-bottom:0;">
+            <div class="bar-label-row"><span class="bar-label">Blood Pressure + Blood Sugar</span><span class="bar-val">Medium</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:57%;background:var(--accent2);"></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p><span class="pulse-dot"></span>270 PATIENT RECORDS · STATLOG HEART DATASET · WEKA J48 · TABLEAU EDA</p>
+    <p>MIDDLESEX UNIVERSITY LONDON · BUSINESS INTELLIGENCE CST3340 · 2021–22</p>
+  </footer>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  // Age distribution data
+  const ageData = [
+    { label: 'U30', present: 0, absent: 1 },
+    { label: 'U40', present: 4, absent: 7 },
+    { label: 'U50', present: 30, absent: 37 },
+    { label: 'U60', present: 48, absent: 59 },
+    { label: 'U70', present: 32, absent: 42 },
+    { label: 'U80', present: 6, absent: 4 },
+  ];
+
+  const maxVal = Math.max(...ageData.map(d => d.present + d.absent));
+  const chartH = 130;
+
+  const container = document.getElementById('ageBars');
+  ageData.forEach(d => {
+    const col = document.createElement('div');
+    col.className = 'age-col';
+
+    const totalH = ((d.present + d.absent) / maxVal) * chartH;
+    const presentH = (d.present / (d.present + d.absent)) * totalH;
+    const absentH = totalH - presentH;
+
+    const barAbsent = document.createElement('div');
+    barAbsent.className = 'age-bar-absent';
+    barAbsent.style.height = absentH + 'px';
+    barAbsent.title = `${d.label} No Disease: ${d.absent}`;
+
+    const barPresent = document.createElement('div');
+    barPresent.className = 'age-bar-present';
+    barPresent.style.height = presentH + 'px';
+    barPresent.title = `${d.label} Disease: ${d.present}`;
+
+    col.appendChild(barAbsent);
+    col.appendChild(barPresent);
+    container.appendChild(col);
+  });
+
+  // Tooltip for scatter dots
+  const tooltip = document.getElementById('tooltip');
+  document.querySelectorAll('.scatter-dot').forEach(dot => {
+    dot.addEventListener('mousemove', (e) => {
+      tooltip.style.display = 'block';
+      tooltip.style.left = (e.clientX + 12) + 'px';
+      tooltip.style.top = (e.clientY - 28) + 'px';
+      tooltip.textContent = dot.dataset.tip || '';
+    });
+    dot.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+  });
+</script>
+</body>
+</html>
