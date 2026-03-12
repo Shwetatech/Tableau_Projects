@@ -294,6 +294,33 @@ Unified global view across 6 international locations. Features a dashboard healt
 
 ---
 
+## Project 5 -  Online Retail Analytics 
+
+ **📌 Project Overview:**
+This project analyzes online retail data to uncover insights about country performance, customer buying behavior, product profitability, and RFM-based customer segmentation. The dashboard empowers business teams to make data-driven decisions.
+
+   **📊 Key Insights:**
+- EIRE, Netherlands, and Germany are top performers outside the UK.
+- EIRE shows the strongest sales growth in the last 3 months.
+- 19% of customers spend more on their second purchase.
+- Majority of customers are one-time buyers.
+- RFM segmentation identifies 262 Best Customers and 937 Occasional Buyers.
+- Top product: POST ($27,204). Lowest: 22941 ($9).
+
+ **🧩 Dashboard Components:**
+1. Country Performance Overview  
+2. Monthly Sales Trend  
+3. Customer Purchase Behaviour  
+4. Product Profitability  
+5. RFM Segmentation  
+
+ **🛠 Tools Used:**
+- Tableau  
+- Excel  
+- Data Cleaning & Preparation  
+
+---
+
 ## 🚀 How to Use
 
 ### Connect CSVs or Excel to Tableau
