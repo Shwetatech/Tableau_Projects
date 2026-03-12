@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 1 – Error Management Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d14;
+    --panel: #111622;
+    --border: #1e2840;
+    --accent: #e63946;
+    --accent2: #457b9d;
+    --gold: #f4a261;
+    --green: #2a9d8f;
+    --text: #e8eaf0;
+    --muted: #6b7a99;
+    --font-head: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-mono); min-height: 100vh; }
+  
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(90deg, #0a0d14 0%, #111a2e 100%);
+  }
+  .logo { font-family: var(--font-head); font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .badge { background: var(--accent); color: #fff; font-size: 10px; padding: 3px 10px; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
+  .ts { color: var(--muted); font-size: 11px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 24px 32px 0; }
+  .kpi {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px 20px;
+    position: relative; overflow: hidden;
+  }
+  .kpi::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 3px; height: 100%; background: var(--kpi-color, var(--accent));
+  }
+  .kpi-label { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .kpi-value { font-family: var(--font-head); font-size: 36px; font-weight: 800; line-height: 1; }
+  .kpi-delta { font-size: 11px; margin-top: 6px; }
+  .up { color: var(--accent); } .down { color: var(--green); }
+
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; padding: 16px 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; padding: 0 32px 24px; }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 20px;
+  }
+  .panel-title {
+    font-family: var(--font-head); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.5px; margin-bottom: 16px; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-title .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  canvas { max-width: 100%; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th { color: var(--muted); text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); letter-spacing: 1px; font-size: 10px; text-transform: uppercase; }
+  td { padding: 7px 8px; border-bottom: 1px solid #161d2e; }
+  tr:hover td { background: #141928; }
+  .sev { padding: 2px 8px; border-radius: 2px; font-size: 10px; font-weight: 500; }
+  .sev-crit { background: rgba(230,57,70,.2); color: var(--accent); }
+  .sev-high { background: rgba(244,162,97,.2); color: var(--gold); }
+  .sev-med { background: rgba(69,123,157,.2); color: var(--accent2); }
+
+  .sparkbar { display: flex; align-items: flex-end; gap: 3px; height: 40px; }
+  .sparkbar div { flex: 1; background: var(--accent2); border-radius: 2px 2px 0 0; opacity: 0.7; }
+  .sparkbar div.peak { background: var(--accent); opacity: 1; }
+
+  .gauge-wrap { display: flex; flex-direction: column; align-items: center; padding: 8px 0; }
+  .gauge-num { font-family: var(--font-head); font-size: 28px; font-weight: 800; margin-top: 4px; }
+  .gauge-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+
+  .heat-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 8px; }
+  .heat-cell { aspect-ratio: 1; border-radius: 3px; }
+
+  .location-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
+  .loc-name { font-size: 11px; width: 70px; }
+  .loc-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .loc-bar { height: 100%; border-radius: 4px; }
+  .loc-val { font-size: 11px; color: var(--muted); width: 36px; text-align: right; }
+
+  footer { text-align: center; padding: 16px; color: var(--muted); font-size: 10px; letter-spacing: 1px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Error<span>Watch</span> · Dashboard</div>
+  <div class="badge">Project 1</div>
+  <div class="ts">Last refreshed: 2026-03-12 08:44 UTC</div>
+</header>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi" style="--kpi-color: var(--accent)">
+    <div class="kpi-label">Total Errors (30d)</div>
+    <div class="kpi-value" style="color:var(--accent)">4,821</div>
+    <div class="kpi-delta up">▲ 12.4% vs prev period</div>
+  </div>
+  <div class="kpi" style="--kpi-color: var(--gold)">
+    <div class="kpi-label">Critical Incidents</div>
+    <div class="kpi-value" style="color:var(--gold)">183</div>
+    <div class="kpi-delta down">▼ 8.1% vs prev period</div>
+  </div>
+  <div class="kpi" style="--kpi-color: var(--green)">
+    <div class="kpi-label">MTTR (hrs)</div>
+    <div class="kpi-value" style="color:var(--green)">2.4h</div>
+    <div class="kpi-delta down">▼ 0.6h improvement</div>
+  </div>
+  <div class="kpi" style="--kpi-color: var(--accent2)">
+    <div class="kpi-label">Resolution Rate</div>
+    <div class="kpi-value" style="color:var(--accent2)">91%</div>
+    <div class="kpi-delta down">▼ ↑ +3pp improvement</div>
+  </div>
+</div>
+
+<!-- Row 1 -->
+<div class="grid-2" style="margin-top:16px;">
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span> Daily Error Trend — Past 30 Days</div>
+    <canvas id="trendChart" height="110"></canvas>
+  </div>
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--gold)"></span> Error by Category</div>
+    <canvas id="donutChart" height="160"></canvas>
+  </div>
+</div>
+
+<!-- Row 2 -->
+<div class="grid-3">
+  <div class="panel" style="grid-column: span 2">
+    <div class="panel-title"><span class="dot" style="background:var(--accent2)"></span> Error Log — Recent Incidents</div>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Timestamp</th><th>System</th><th>Location</th><th>Severity</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>#E-2841</td><td>2026-03-12 07:32</td><td>Payment Gateway</td><td>Frankfurt</td><td><span class="sev sev-crit">Critical</span></td><td>🔴 Open</td></tr>
+        <tr><td>#E-2840</td><td>2026-03-12 06:18</td><td>Auth Service</td><td>Singapore</td><td><span class="sev sev-high">High</span></td><td>🟡 In Progress</td></tr>
+        <tr><td>#E-2839</td><td>2026-03-12 04:55</td><td>Data Pipeline</td><td>Chicago</td><td><span class="sev sev-med">Medium</span></td><td>🟢 Resolved</td></tr>
+        <tr><td>#E-2838</td><td>2026-03-11 22:40</td><td>Reporting API</td><td>Dubai</td><td><span class="sev sev-high">High</span></td><td>🟢 Resolved</td></tr>
+        <tr><td>#E-2837</td><td>2026-03-11 19:14</td><td>Notification Svc</td><td>London</td><td><span class="sev sev-crit">Critical</span></td><td>🟢 Resolved</td></tr>
+        <tr><td>#E-2836</td><td>2026-03-11 15:02</td><td>DB Cluster</td><td>Frankfurt</td><td><span class="sev sev-crit">Critical</span></td><td>🟢 Resolved</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--green)"></span> Errors by Location</div>
+    <div style="margin-top:8px;">
+      <div class="location-row"><span class="loc-name">Frankfurt</span><div class="loc-bar-wrap"><div class="loc-bar" style="width:88%;background:var(--accent)"></div></div><span class="loc-val">1,124</span></div>
+      <div class="location-row"><span class="loc-name">Singapore</span><div class="loc-bar-wrap"><div class="loc-bar" style="width:71%;background:var(--gold)"></div></div><span class="loc-val">908</span></div>
+      <div class="location-row"><span class="loc-name">Chicago</span><div class="loc-bar-wrap"><div class="loc-bar" style="width:58%;background:var(--accent2)"></div></div><span class="loc-val">741</span></div>
+      <div class="location-row"><span class="loc-name">London</span><div class="loc-bar-wrap"><div class="loc-bar" style="width:49%;background:var(--green)"></div></div><span class="loc-val">628</span></div>
+      <div class="location-row"><span class="loc-name">Dubai</span><div class="loc-bar-wrap"><div class="loc-bar" style="width:37%;background:var(--accent2)"></div></div><span class="loc-val">471</span></div>
+      <div class="location-row"><span class="loc-name">São Paulo</span><div class="loc-bar-wrap"><div class="loc-bar" style="width:27%;background:var(--muted)"></div></div><span class="loc-val">349</span></div>
+    </div>
+
+    <div style="margin-top:18px;">
+      <div class="panel-title" style="margin-bottom:8px;"><span class="dot" style="background:var(--accent)"></span> Weekly Heat Map</div>
+      <div style="display:flex;gap:4px;margin-bottom:4px;font-size:9px;color:var(--muted);">
+        <span style="flex:1;text-align:center">M</span><span style="flex:1;text-align:center">T</span>
+        <span style="flex:1;text-align:center">W</span><span style="flex:1;text-align:center">T</span>
+        <span style="flex:1;text-align:center">F</span><span style="flex:1;text-align:center">S</span>
+        <span style="flex:1;text-align:center">S</span>
+      </div>
+      <div id="heatmap"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Tableau-style Dashboard · Project 1: Error Management · Built with Chart.js · Data is illustrative</footer>
+
+<script>
+// Trend Chart
+const trendCtx = document.getElementById('trendChart').getContext('2d');
+const days = Array.from({length:30},(_,i)=>`Mar ${i+1}`);
+const vals = [120,95,180,210,88,144,200,310,175,90,130,265,310,188,222,290,130,88,140,250,320,195,170,240,280,160,110,190,260,310];
+new Chart(trendCtx, {
+  type:'line',
+  data:{
+    labels:days,
+    datasets:[{
+      label:'Errors',data:vals,fill:true,
+      borderColor:'#e63946',backgroundColor:'rgba(230,57,70,.08)',
+      borderWidth:2,pointRadius:0,tension:0.4
+    },{
+      label:'Critical',data:vals.map(v=>Math.floor(v*0.12)),fill:false,
+      borderColor:'#f4a261',borderWidth:1.5,borderDash:[4,4],
+      pointRadius:0,tension:0.4
+    }]
+  },
+  options:{responsive:true,plugins:{legend:{labels:{color:'#6b7a99',font:{size:10}}}},
+    scales:{x:{ticks:{color:'#6b7a99',font:{size:9},maxTicksLimit:8},grid:{color:'#1e2840'}},
+             y:{ticks:{color:'#6b7a99',font:{size:9}},grid:{color:'#1e2840'}}}}
+});
+
+// Donut Chart
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(donutCtx,{
+  type:'doughnut',
+  data:{
+    labels:['Auth Errors','Payment','Pipeline','API Timeout','DB Errors','Other'],
+    datasets:[{data:[28,22,18,14,11,7],
+      backgroundColor:['#e63946','#f4a261','#457b9d','#2a9d8f','#e9c46a','#6b7a99'],
+      borderWidth:0,hoverOffset:6}]
+  },
+  options:{responsive:true,cutout:'70%',
+    plugins:{legend:{position:'bottom',labels:{color:'#6b7a99',font:{size:9},boxWidth:10,padding:8}}}}
+});
+
+// Heatmap
+const hm = document.getElementById('heatmap');
+const intensities = [
+  [0.2,0.5,0.8,1,0.6,0.1,0.1],
+  [0.3,0.4,0.9,0.7,0.8,0.2,0.1],
+  [0.5,0.8,1,0.5,0.6,0.1,0.2],
+  [0.4,0.7,0.8,0.9,0.7,0.1,0.1]
+];
+let hmHtml = '';
+intensities.forEach(row=>{
+  hmHtml += '<div style="display:flex;gap:4px;margin-bottom:4px;">';
+  row.forEach(v=>{
+    const c = v>0.8?'#e63946':v>0.6?'#f4a261':v>0.4?'#457b9d':v>0.2?'#1e3860':'#131929';
+    hmHtml += `<div style="flex:1;height:14px;border-radius:2px;background:${c};opacity:${0.5+v*0.5}"></div>`;
+  });
+  hmHtml += '</div>';
+});
+hm.innerHTML = hmHtml;
+</script>
+</body>
+</html>
