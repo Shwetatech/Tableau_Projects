@@ -1,0 +1,7 @@
+dimension,current_score,target_score,description
+Accuracy,92,95,Data correctness and validation rate across all dashboards
+Performance,88,90,Average dashboard load time and query execution speed
+Coverage,76,90,Percentage of business areas with active monitoring dashboards
+Stability,95,95,Uptime and error-free operation rate of published dashboards
+Adoption,82,90,Active user engagement and stakeholder usage rate
+Freshness,90,95,Data recency and scheduled refresh success rate

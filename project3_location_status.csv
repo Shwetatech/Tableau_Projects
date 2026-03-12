@@ -1,0 +1,7 @@
+location,country,region,timezone,open_errors,uptime_pct,active_dashboards,avg_response_ms,team_size,last_incident,health_score
+Frankfurt,Germany,EU,CET,12,99.4,18,148,14,2026-03-12 07:32,88
+Singapore,Singapore,APAC,SGT,8,99.7,12,138,10,2026-03-12 06:18,91
+Chicago,USA,Americas,CST,3,99.9,11,132,9,2026-03-12 04:55,96
+London,UK,EU,GMT,4,99.8,10,141,8,2026-03-11 19:14,94
+Dubai,UAE,MEA,GST,5,99.6,7,155,6,2026-03-11 22:40,90
+São Paulo,Brazil,Americas,BRT,2,99.9,4,128,5,2026-03-10 11:20,97

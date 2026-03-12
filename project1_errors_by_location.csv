@@ -1,0 +1,7 @@
+location,country,region,total_errors_30d,critical,high,medium,low,open,resolved,avg_mttr_hours,resolution_rate_pct
+Frankfurt,Germany,EU,1124,135,264,422,303,12,1112,3.4,98.9
+Singapore,Singapore,APAC,908,109,213,341,245,8,900,3.0,99.1
+Chicago,USA,Americas,741,89,174,278,200,3,738,2.6,99.6
+London,UK,EU,628,75,147,236,170,4,624,2.8,99.4
+Dubai,UAE,MEA,471,57,110,177,127,5,466,3.1,98.9
+São Paulo,Brazil,Americas,349,42,82,131,94,2,347,2.4,99.4

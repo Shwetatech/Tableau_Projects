@@ -1,0 +1,26 @@
+incident_id,timestamp,system,location,severity,status,error_category,mttr_hours,assigned_team
+E-2836,2026-03-11 15:02,DB Cluster,Frankfurt,Critical,Resolved,DB Errors,2.1,Platform
+E-2837,2026-03-11 19:14,Notification Svc,London,Critical,Resolved,API Timeout,1.8,Backend
+E-2838,2026-03-11 22:40,Reporting API,Dubai,High,Resolved,API Timeout,3.2,BI Analytics
+E-2839,2026-03-12 04:55,Data Pipeline,Chicago,Medium,Resolved,Pipeline,1.4,Data Eng
+E-2840,2026-03-12 06:18,Auth Service,Singapore,High,In Progress,Auth Errors,2.5,Security
+E-2841,2026-03-12 07:32,Payment Gateway,Frankfurt,Critical,Open,Payment,0.0,Payments
+E-2800,2026-03-10 08:14,Data Pipeline,Singapore,Medium,Resolved,Pipeline,2.2,Data Eng
+E-2801,2026-03-10 09:30,Auth Service,Chicago,High,Resolved,Auth Errors,3.0,Security
+E-2802,2026-03-10 11:45,DB Cluster,London,Critical,Resolved,DB Errors,4.5,Platform
+E-2803,2026-03-10 13:20,Payment Gateway,São Paulo,High,Resolved,Payment,2.8,Payments
+E-2804,2026-03-10 15:00,Reporting API,Frankfurt,Medium,Resolved,API Timeout,1.9,BI Analytics
+E-2805,2026-03-10 16:30,Notification Svc,Dubai,Low,Resolved,Other,0.8,Backend
+E-2806,2026-03-09 07:10,Auth Service,Frankfurt,Critical,Resolved,Auth Errors,3.6,Security
+E-2807,2026-03-09 09:00,Data Pipeline,London,High,Resolved,Pipeline,2.4,Data Eng
+E-2808,2026-03-09 11:30,DB Cluster,Singapore,Medium,Resolved,DB Errors,1.5,Platform
+E-2809,2026-03-09 14:00,Payment Gateway,Chicago,Critical,Resolved,Payment,5.1,Payments
+E-2810,2026-03-09 16:20,Reporting API,São Paulo,Low,Resolved,API Timeout,0.9,BI Analytics
+E-2811,2026-03-08 08:00,Notification Svc,Frankfurt,High,Resolved,Other,2.0,Backend
+E-2812,2026-03-08 10:30,Auth Service,Dubai,Medium,Resolved,Auth Errors,1.7,Security
+E-2813,2026-03-08 13:00,Data Pipeline,Chicago,Critical,Resolved,Pipeline,4.2,Data Eng
+E-2814,2026-03-07 09:15,DB Cluster,São Paulo,High,Resolved,DB Errors,3.1,Platform
+E-2815,2026-03-07 11:45,Payment Gateway,London,Critical,Resolved,Payment,5.8,Payments
+E-2816,2026-03-07 14:00,Reporting API,Singapore,Medium,Resolved,API Timeout,1.3,BI Analytics
+E-2817,2026-03-06 08:30,Notification Svc,Chicago,High,Resolved,Other,2.5,Backend
+E-2818,2026-03-06 10:00,Auth Service,London,Critical,Resolved,Auth Errors,3.9,Security

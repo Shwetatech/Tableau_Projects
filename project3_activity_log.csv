@@ -1,0 +1,13 @@
+event_id,timestamp_utc,event_type,description,team,location,priority,linked_story
+ACT-001,2026-03-12 08:44:12,Error Opened,Critical error #E-2841 opened — Payment Gateway timeout,Payments,Frankfurt,P1,US-001
+ACT-002,2026-03-12 08:31:05,Dashboard Published,Dashboard SLA Overview v3 published,BI Analytics,Remote,P2,US-012
+ACT-003,2026-03-12 08:19:44,Calc Field Deployed,MTTR_Optimized deployed to production — 28% perf gain,Data Engineering,Remote,P2,US-002
+ACT-004,2026-03-12 07:55:20,Ad-Hoc Request,Daily error breakdown by system requested,BI Analytics,Singapore,P1,US-009
+ACT-005,2026-03-12 07:12:08,Error Resolved,Error #E-2839 resolved — root cause: stale cache,Data Engineering,Chicago,P2,
+ACT-006,2026-03-12 06:00:00,Meeting Scheduled,Weekly cross-location review — 6 teams confirmed,All Teams,Remote,P3,
+ACT-007,2026-03-11 22:40:00,Error Opened,Error #E-2838 opened — Reporting API Dubai,BI Analytics,Dubai,P2,
+ACT-008,2026-03-11 19:14:00,Error Opened,Critical error #E-2837 — Notification Svc London,Backend,London,P1,
+ACT-009,2026-03-11 15:02:00,Error Opened,Critical error #E-2836 — DB Cluster Frankfurt,Platform,Frankfurt,P1,
+ACT-010,2026-03-11 10:30:00,Story Update,US-003 Region drill-through: design approved,Viz Team,Singapore,P1,US-003
+ACT-011,2026-03-10 14:00:00,Story Blocked,US-004 Auto-refresh pipeline blocked on infra approval,Infra,Chicago,P2,US-004
+ACT-012,2026-03-10 09:00:00,Dashboard Updated,Error Management main dashboard accuracy fix applied,BI Analytics,Frankfurt,P1,US-012

@@ -1,0 +1,11 @@
+metric,category,target,actual,unit,status,period,owner
+Dashboard Delivery Rate,Delivery,95,97,percent,On Track,Q1 2026,BI Analytics
+Data Accuracy SLA,Quality,99.5,99.2,percent,Watch,Q1 2026,Data Engineering
+Error Resolution SLA,Operations,90,85,percent,At Risk,Q1 2026,Platform
+Ad-Hoc Turnaround Time,Responsiveness,48,36,hours,On Track,Q1 2026,BI Analytics
+Calculated Field Optimization,Performance,20,28,percent,Exceeded,Q1 2026,Data Engineering
+Stakeholder CSAT Score,Satisfaction,4.5,4.7,score_out_of_5,Exceeded,Q1 2026,Analytics Team
+Active Dashboards,Coverage,50,62,count,On Track,Q1 2026,BI Analytics
+User Stories Completed,Delivery,90,93,percent,On Track,Q1 2026,Product
+Dashboard Load Time,Performance,2.5,1.8,seconds,Exceeded,Q1 2026,Engineering
+Cross-Team Collaboration,Teamwork,80,87,percent,On Track,Q1 2026,All Teams

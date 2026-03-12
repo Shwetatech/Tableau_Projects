@@ -1,0 +1,16 @@
+story_id,title,type,team,priority,status,location,created_date,completed_date,turnaround_hours,stakeholder
+US-001,SLA segment error breakdown,User Story,BI Analytics,P1,In Progress,Frankfurt,2026-03-10,,72,Operations Director
+US-002,MTTR calculated field v2,User Story,Data Engineering,P2,Done,Remote,2026-03-05,2026-03-07,48,Analytics Lead
+US-003,Region drill-through filters,User Story,Viz Team,P1,In Progress,Singapore,2026-03-09,,60,Regional Manager
+US-004,Auto-refresh pipeline integration,User Story,Infra,P2,Blocked,Chicago,2026-03-08,,96,CTO
+US-005,Stakeholder export to PDF,User Story,BI Analytics,P3,Done,London,2026-03-04,2026-03-06,40,VP Analytics
+US-006,LOD accuracy audit,User Story,QA,P2,Done,Dubai,2026-03-06,2026-03-08,44,Head of QA
+US-007,Rolling 7-day error rate calc,Ad-Hoc,Data Engineering,P1,Done,Remote,2026-03-01,2026-03-02,18,Operations Director
+US-008,Cross-location heatmap,User Story,Viz Team,P2,Done,Frankfurt,2026-02-28,2026-03-03,36,Regional Manager
+US-009,Executive summary dashboard,Ad-Hoc,BI Analytics,P1,Done,Remote,2026-03-11,2026-03-12,20,CEO
+US-010,Payment error trend analysis,Ad-Hoc,BI Analytics,P1,Done,Frankfurt,2026-03-07,2026-03-08,24,CFO
+US-011,Resolution rate by team,User Story,BI Analytics,P2,In Progress,Singapore,2026-03-10,,48,Head of Ops
+US-012,Quarterly scorecard refresh,User Story,Analytics Team,P1,Done,Remote,2026-03-01,2026-03-05,96,All Stakeholders
+US-013,Filter by severity on main dash,Ad-Hoc,Viz Team,P3,Done,London,2026-03-09,2026-03-10,22,Regional Manager
+US-014,CSAT survey integration,User Story,Product,P3,In Progress,Chicago,2026-03-08,,72,VP Product
+US-015,Weekly email digest automation,Ad-Hoc,Engineering,P2,Blocked,Remote,2026-03-06,,120,All Teams
