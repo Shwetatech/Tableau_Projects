@@ -204,3 +204,110 @@ This project involves sensitive health data. Key ethical considerations include:
 | **Academic Year** | 2021–22 |
 | **Submission** | April 15, 2022 |
 
+## Project 2 — Error Management Dashboard
+
+Monitors system errors across 6 global locations in real time. Covers daily trend analysis, severity breakdown, incident log, location comparison, and a weekly heatmap.
+
+| KPI | Value |
+|-----|-------|
+| Total Errors (30d) | 4,821 |
+| Critical Incidents | 183 |
+| MTTR (Average) | 2.4 hours |
+| Resolution Rate | 91% |
+
+**Datasets used:**
+- `project1_daily_errors.csv` — 30 days of error counts by severity
+- `project1_incident_log.csv` — 25 individual incident records
+- `project1_errors_by_location.csv` — Aggregated totals per location
+
+**Key Calculated Fields:**
+```tableau
+// Rolling 7-Day Error Rate (LOD + Window)
+WINDOW_SUM({ FIXED [Date] : SUM([Error Count]) }, -6, 0) 
+  / WINDOW_SUM(SUM([Total Events]), -6, 0)
+
+// MTTR — handles open incidents with NOW()
+DATEDIFF('hour', [Created Timestamp], 
+  IF [Status]='Resolved' THEN [Resolved Timestamp] ELSE NOW() END)
+```
+
+---
+
+## Project 3 — KPI & Stakeholder Performance Dashboard
+
+Tracks analytics delivery KPIs, user story completion, ad-hoc request turnaround, and Tableau calculated field performance for executive stakeholders.
+
+| KPI | Target | Actual | Status |
+|-----|--------|--------|--------|
+| Dashboard Delivery Rate | 95% | 97% | ✅ On Track |
+| Data Accuracy SLA | 99.5% | 99.2% | ⚠️ Watch |
+| Error Resolution SLA | 90% | 85% | 🔴 At Risk |
+| Ad-Hoc Turnaround | 48h | 36h | ✅ On Track |
+| Calc Field Optimization | 20% | 28% | ⭐ Exceeded |
+| Stakeholder CSAT | 4.5/5 | 4.7/5 | ⭐ Exceeded |
+
+**Datasets used:**
+- `project2_kpi_scorecard.csv` — 10 KPI metrics with targets and RAG status
+- `project2_user_stories.csv` — 15 user stories with team, priority, and timeline
+- `project2_monthly_kpi_trend.csv` — 6-month trend across all KPIs
+
+**Key Calculated Fields:**
+```tableau
+// Weighted Severity Score
+([Critical]*4 + [High]*3 + [Medium]*2 + [Low]*1) / [Total Errors]
+
+// Story Completion Rate
+SUM(IF [Status]='Done' THEN 1 ELSE 0 END) / COUNT([Story ID])
+```
+
+---
+
+## Project 4 — Global Operations Dashboard
+
+Unified global view across 6 international locations. Features a dashboard health radar, cross-region error comparison, user story tracker, and live activity feed.
+
+| Location | Open Errors | Uptime | Health Score |
+|----------|-------------|--------|--------------|
+| Frankfurt 🇩🇪 | 12 | 99.4% | 88 |
+| Singapore 🇸🇬 | 8 | 99.7% | 91 |
+| Chicago 🇺🇸 | 3 | 99.9% | 96 |
+| London 🇬🇧 | 4 | 99.8% | 94 |
+| Dubai 🇦🇪 | 5 | 99.6% | 90 |
+| São Paulo 🇧🇷 | 2 | 99.9% | 97 |
+
+**Datasets used:**
+- `project3_location_status.csv` — Real-time KPIs per location
+- `project3_weekly_errors_by_region.csv` — Error counts by day and region
+- `project3_dashboard_health_radar.csv` — 6-dimension health scores vs targets
+- `project3_activity_log.csv` — Collaboration events across teams
+
+**Dashboard Health Radar Dimensions:**
+
+| Dimension | Current | Target |
+|-----------|---------|--------|
+| Accuracy | 92 | 95 |
+| Performance | 88 | 90 |
+| Coverage | 76 ⚠️ | 90 |
+| Stability | 95 | 95 |
+| Adoption | 82 | 90 |
+| Freshness | 90 | 95 |
+
+---
+
+## 🚀 How to Use
+
+### Connect CSVs to Tableau
+1. Open Tableau Desktop
+2. Click **Connect → Text File**
+3. Select a `.csv` from the `/datasets/` folder
+4. Build views using the field names documented in each report
+
+### Open HTML Dashboards
+Open any `.html` file in the `/dashboards/` folder directly in a browser — no server needed. Dashboards use Chart.js (loaded from CDN) and are fully interactive.
+
+### Read the Reports
+Open any `.docx` file from `/reports/` in Microsoft Word, Google Docs, or LibreOffice. Each report includes executive summary, KPI analysis, dataset documentation, calculated field code, and recommendations.
+
+---
+
+
